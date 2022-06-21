@@ -20,7 +20,7 @@ const signup = async (req, res, next) => {
   }
 
   try {
-    const hashedPassword = bcrypt.hashSync(password);
+    const hashedPassword = bcrypt?.hashSync(password, 10);
     if (!existingUser) {
     const user = new User({
             name,
@@ -29,7 +29,7 @@ const signup = async (req, res, next) => {
     })
       await user.save();
 
-      return res.status(200).json({ user });
+      return res.status(200).json({user, message: "sign up sucessfull" });
     }
   } catch (error) {
     console.log({ message: error });
@@ -56,20 +56,6 @@ const signin = async (req, res, next) => {
     expiresIn: "35s",
   });
 
-  // console.log("Generated Token\n", token);
-
-  // if (req.cookies[`${existingUser._id}`]) {
-  //   req.cookies[`${existingUser._id}`] = "";
-  // }
-
-  // res.cookie(String(existingUser._id), token, {
-  //   path: "/",
-  //   expires: new Date(Date.now() + 1000 * 30), // 30 seconds
-  //   httpOnly: true,
-  //   sameSite: "lax",
-  // });
-
-  
   return res
     .status(200)
     .json({ message: "Successfully Logged In", user: existingUser, token });
@@ -91,21 +77,21 @@ const verifyToken = (req, next, res) => {
   next();
 };
 
-const getUser = async (req, next, res) => {
-    const userId = req.id
-    let user;
-    try {
-      user = await User.findById(userId, "-password");
-    } catch (err) {
-      return new Error(err);
-    }
-    if (!user) {
-      res.status(404).json({ messsage: "User Not FOund" });
-    }
-    return res.status(200).json({ user });
-};
+// const getUser = async (req, res, next) => {
+//     const {id} = req.params
+//     let user;
+//     try {
+//       user = await User.findById(id, "-password");
+//     } catch (err) {
+//       return new Error(err);
+//     }
+//     if (!user) {
+//       return res.status(404).json({ messsage: "User Not FOund" });
+//     }  
+//       return res.status(200).json({user})
+// };
 
 exports.signin = signin;
 exports.signup = signup;
 exports.verifyToken = verifyToken;
-exports.getUser = getUser;
+
